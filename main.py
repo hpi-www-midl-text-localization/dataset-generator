@@ -1,5 +1,5 @@
 from random import randrange, choice
-import string
+import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
 
@@ -20,12 +20,13 @@ def render_text_and_return_aabb(draw, xy, text, font=None, color=(255, 255, 255)
     return (xy[0], xy[1], xy[0] + width, xy[1] + height)
 
 
-def render_random_text_at_random_position_and_return_aabb(image,
-                                                          min_text_length=2,
-                                                          max_text_length=10,
-                                                          min_font_size=8,
-                                                          max_font_size=24,
-                                                          text_color=(255, 255, 255)):
+def render_random_words_at_random_position_and_return_aabb(image,
+                                                           word_list,
+                                                           min_word_count=1,
+                                                           max_word_count=3,
+                                                           min_font_size=8,
+                                                           max_font_size=24,
+                                                           text_color=(255, 255, 255)):
     """Renders a random single-line text at a random position and
     allows to set minima and maxima for the text length and for the
     font size. Returns the AABB of the resulting text.
@@ -36,9 +37,8 @@ def render_random_text_at_random_position_and_return_aabb(image,
     x = randrange(image_width + 1)
     y = randrange(image_height + 1)
 
-    text_length = randrange(min_text_length, max_text_length + 1)
-    characters = string.ascii_letters + string.digits
-    text = ''.join([choice(characters) for i in range(text_length)])
+    word_count = randrange(min_word_count, max_word_count + 1)
+    text = ' '.join([choice(word_list) for i in range(word_count)])
 
     font_size = randrange(min_font_size, max_font_size + 1, 2)  # use only even font sizes
     font = ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", font_size)
@@ -53,9 +53,11 @@ image_height = 256
 
 image = Image.new("RGB", (image_width, image_height))
 
+words = np.loadtxt('words.txt', dtype=np.dtype(str), delimiter="\n")
+
 rand_color = (randrange(255), randrange(255), randrange(255))
 
-top_left_x, top_left_y, bottom_right_x, bottom_right_y = render_random_text_at_random_position_and_return_aabb(image, text_color=rand_color)
+top_left_x, top_left_y, bottom_right_x, bottom_right_y = render_random_words_at_random_position_and_return_aabb(image, words, text_color=rand_color)
 
 print(top_left_x, top_left_y, bottom_right_x, bottom_right_y)
 
