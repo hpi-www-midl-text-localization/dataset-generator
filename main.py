@@ -1,5 +1,7 @@
 from random import randrange, choice
 import string
+import os
+import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
 
@@ -67,8 +69,25 @@ def create_images_with_text_and_bounding_box(n, width, height):
     return images, bounding_boxes
 
 
+def save_image_dataset(images):
+    """Saves the images and creates a text file that stores their
+    locations. This allows the images to be loaded as a Chainer ImageDataset.
+    """
+    if not os.path.exists("./images"):
+        os.makedirs("./images")
+
+    image_paths = [f"./images/image_{i}.png" for i in range(0, len(images))]
+    np.savetxt("image_locations.txt", image_paths, fmt="%s")
+
+    for i in range(0, len(images)):
+        images[i].save(image_paths[i])
+
+
 image_width = 256
 image_height = 256
+image_count = 10
 
-images, bounding_boxes = create_images_with_text_and_bounding_box(10, image_width, image_height)
+images, bounding_boxes = create_images_with_text_and_bounding_box(image_count, image_width, image_height)
 
+save_image_dataset(images)
+np.save("bounding_boxes.npy", bounding_boxes)
