@@ -64,7 +64,7 @@ def render_random_words_at_random_position_and_return_aabb(image,
 @click.command()
 @click.option("--width", "-w", default=256, help="Width of generated output images.")
 @click.option("--height", "-h", default=256, help="Height of generated output images.")
-@click.option("--wordsfile", "--words", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
+@click.option("--words", "--wordsfile", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
 @click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
 def main(width, height, wordsfile, userseed):
     """Image generator for text localization. Generates images with words and their corresponding AABB's."""
