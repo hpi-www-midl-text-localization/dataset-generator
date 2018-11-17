@@ -6,3 +6,6 @@ lib/
 include/
 pyvenv.cfg
 pip-selfcheck.json
+
+# ignore pytest
+.pytest_cache
