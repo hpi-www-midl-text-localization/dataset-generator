@@ -9,3 +9,4 @@ pip-selfcheck.json
 
 # ignore pytest
 .pytest_cache
+__pycache__
