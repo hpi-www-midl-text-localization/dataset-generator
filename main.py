@@ -1,11 +1,10 @@
 from random import randrange, choice
-import string
 import os
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
 
-def render_text_and_return_aabb(draw, xy, text, font=None, color=(255, 255, 255)):
+def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
     """Renders a text using ImageDraw.text() and returns its AABB.
 
     The resulting AABB is in the following format:
@@ -16,18 +15,33 @@ def render_text_and_return_aabb(draw, xy, text, font=None, color=(255, 255, 255)
     if font is None:
         font = ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", 12)
 
-    width, height = font.getsize(text)
-    draw.text(xy, text, font=font, fill=color)
+    draw = ImageDraw.Draw(image)
 
-    return xy[0], xy[1], xy[0] + width, xy[1] + height
+    top_left = xy
+    space_size = font.getsize(" ")[0]
+    bounding_boxes = []
+
+    for word in words_in_line:
+        width, height = font.getsize(word)
+        bottom_right = (min(top_left[0] + width, image.width), min(top_left[1] + height, image.height))
+        bounding_boxes.append((top_left[0], top_left[1], bottom_right[0], bottom_right[1]))
+
+        draw.text(top_left, word + " ", font=font, fill=color)
+        top_left = (top_left[0] + width + space_size, top_left[1])
+
+        if top_left[0] >= image.width:
+            break
+
+    return bounding_boxes
 
 
-def render_random_text_at_random_position_and_return_aabb(image,
-                                                          min_text_length=2,
-                                                          max_text_length=10,
-                                                          min_font_size=8,
-                                                          max_font_size=24,
-                                                          text_color=(255, 255, 255)):
+def render_random_words_at_random_position_and_return_aabb(image,
+                                                           word_list,
+                                                           min_word_count=1,
+                                                           max_word_count=3,
+                                                           min_font_size=8,
+                                                           max_font_size=24,
+                                                           text_color=(255, 255, 255)):
     """Renders a random single-line text at a random position and
     allows to set minima and maxima for the text length and for the
     font size. Returns the AABB of the resulting text.
@@ -38,19 +52,16 @@ def render_random_text_at_random_position_and_return_aabb(image,
     x = randrange(image_width + 1)
     y = randrange(image_height + 1)
 
-    text_length = randrange(min_text_length, max_text_length + 1)
-    characters = string.ascii_letters + string.digits
-    text = ''.join([choice(characters) for _ in range(text_length)])
+    word_count = randrange(min_word_count, max_word_count + 1)
+    text = [choice(word_list) for _ in range(word_count)]
 
     font_size = randrange(min_font_size, max_font_size + 1, 2)  # use only even font sizes
     font = ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", font_size)
 
-    draw = ImageDraw.Draw(image)
-
-    return render_text_and_return_aabb(draw, (x, y), text, font=font, color=text_color)
+    return render_line_and_return_aabb(image, (x, y), text, font=font, color=text_color)
 
 
-def create_images_with_text_and_bounding_box(n, width, height):
+def create_images_with_text_and_bounding_box(n, word_list, width, height):
     """Creates n images with text on them. The images will have the
     dimensions width x height. Returns generated images and the
     bounding boxes of the text on them.
@@ -62,8 +73,7 @@ def create_images_with_text_and_bounding_box(n, width, height):
         image = Image.new("RGB", (width, height))
 
         rand_color = (randrange(255), randrange(255), randrange(255))
-
-        bounding_boxes.append(render_random_text_at_random_position_and_return_aabb(image, text_color=rand_color))
+        bounding_boxes.append(render_random_words_at_random_position_and_return_aabb(image, word_list, text_color=rand_color))
         images.append(image)
 
     return images, bounding_boxes
@@ -86,8 +96,10 @@ def save_image_dataset(images):
 image_width = 256
 image_height = 256
 image_count = 10
+words = np.loadtxt('words.txt', dtype=np.dtype(str), delimiter="\n")
 
-images, bounding_boxes = create_images_with_text_and_bounding_box(image_count, image_width, image_height)
+images, bounding_boxes = create_images_with_text_and_bounding_box(image_count, words, image_width, image_height)
+
 
 save_image_dataset(images)
 np.save("bounding_boxes.npy", bounding_boxes)
