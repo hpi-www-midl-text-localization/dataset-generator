@@ -2,4 +2,6 @@
 Scripts to generate simple images with text on them
 
 # Usage
+Install dependencies with `pip install -r requirements.txt`
+
 For help use `python main.py --help`

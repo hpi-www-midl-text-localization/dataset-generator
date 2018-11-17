@@ -1,1 +1,8 @@
 .idea/
+
+# ignore venv
+bin/
+lib/
+include/
+pyvenv.cfg
+pip-selfcheck.json
