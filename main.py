@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 import click
 
+
 def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
     """Renders a text using ImageDraw.text() and returns its AABB.
 
@@ -59,19 +60,20 @@ def render_random_words_at_random_position_and_return_aabb(image,
 
     return render_line_and_return_aabb(image, (x, y), text, font=font, color=text_color)
 
+
 @click.command()
 @click.option("--width", "-w", default=256, help="Width of generated output images.")
 @click.option("--height", "-h", default=256, help="Height of generated output images.")
 @click.option("--wordsfile", "--words", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
 @click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
-def main(width, height, words, userseed):
-    """Image generator for textlocalization. Generates images with words and their corresponding AABB's."""
-    if(userseed != None):
+def main(width, height, wordsfile, userseed):
+    """Image generator for text localization. Generates images with words and their corresponding AABB's."""
+    if userseed is not None:
         seed(userseed)
 
     image = Image.new("RGB", (width, height))
 
-    words = np.loadtxt(words, dtype=np.dtype(str), delimiter="\n")
+    words = np.loadtxt(wordsfile, dtype=np.dtype(str), delimiter="\n")
 
     rand_color = (randrange(255), randrange(255), randrange(255))
 
@@ -81,6 +83,7 @@ def main(width, height, words, userseed):
         print(bbox)
 
     image.show()
+
 
 if __name__ == '__main__':
     # pylint: disable=no-value-for-parameter
