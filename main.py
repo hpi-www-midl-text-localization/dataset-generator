@@ -11,9 +11,9 @@ from PIL import Image, ImageDraw, ImageFont
 def calculate_word_aabb(word, top_left, font, image):
     """Calculates an aabb around word"""
     width, height = font.getsize(word)
-    bottom_right = (min(top_left[0] + width, image.width), min(top_left[1] + height, image.height))
+    bottom_right = (min(top_left[0] + width, image.width),
+                    min(top_left[1] + height, image.height))
     return (top_left[0], top_left[1], bottom_right[0], bottom_right[1]), width
-
 
 
 def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
@@ -66,8 +66,10 @@ def render_random_words_at_random_position_and_return_aabb(image,
     word_count = randrange(min_word_count, max_word_count + 1)
     text = [choice(word_list) for _ in range(word_count)]
 
-    font_size = randrange(min_font_size, max_font_size + 1, 2)  # use only even font sizes
-    font = ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", font_size)
+    font_size = randrange(min_font_size, max_font_size +
+                          1, 2)  # use only even font sizes
+    font = ImageFont.truetype(
+        "fonts/open-sans/OpenSans-Regular.ttf", font_size)
 
     return render_line_and_return_aabb(image, (x, y), text, font=font, color=text_color)
 
@@ -84,7 +86,8 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height):
         image = Image.new("RGB", (width, height))
 
         rand_color = (randrange(255), randrange(255), randrange(255))
-        bounding_boxes.append(render_random_words_at_random_position_and_return_aabb(image, word_list, text_color=rand_color))
+        bounding_boxes.append(render_random_words_at_random_position_and_return_aabb(
+            image, word_list, text_color=rand_color))
         images.append(image)
 
     return images, bounding_boxes
@@ -102,7 +105,7 @@ def save_image_dataset(images):
 
     for i in range(0, len(images)):
         images[i].save(image_paths[i])
-        
+
 
 @click.command()
 @click.option("--width", "-w", default=256, help="Width of generated output images.")
@@ -116,8 +119,9 @@ def main(width, height, count, wordsfile, userseed):
         seed(userseed)
 
     words = np.loadtxt(wordsfile, dtype=np.dtype(str), delimiter="\n")
-    
-    images, bounding_boxes = create_images_with_text_and_bounding_box(count, words, width, height)
+
+    images, bounding_boxes = create_images_with_text_and_bounding_box(
+        count, words, width, height)
 
     save_image_dataset(images)
     np.save("bounding_boxes.npy", bounding_boxes)
