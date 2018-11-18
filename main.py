@@ -2,7 +2,18 @@ import os
 from random import randrange, choice, seed
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
+
 import click
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
+
+def calculate_word_aabb(word, top_left, font, image):
+    """Calculates an aabb around word"""
+    width, height = font.getsize(word)
+    bottom_right = (min(top_left[0] + width, image.width), min(top_left[1] + height, image.height))
+    return (top_left[0], top_left[1], bottom_right[0], bottom_right[1]), width
+
 
 
 def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
@@ -23,9 +34,8 @@ def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255,
     bounding_boxes = []
 
     for word in words_in_line:
-        width, height = font.getsize(word)
-        bottom_right = (min(top_left[0] + width, image.width), min(top_left[1] + height, image.height))
-        bounding_boxes.append((top_left[0], top_left[1], bottom_right[0], bottom_right[1]))
+        aabb, width = calculate_word_aabb(word, top_left, font, image)
+        bounding_boxes.append(aabb)
 
         draw.text(top_left, word + " ", font=font, fill=color)
         top_left = (top_left[0] + width + space_size, top_left[1])

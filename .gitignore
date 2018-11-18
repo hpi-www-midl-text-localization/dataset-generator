@@ -1,1 +1,18 @@
 .idea/
+.vscode/
+
+# ignore venv
+bin/
+lib/
+include/
+pyvenv.cfg
+pip-selfcheck.json
+
+# ignore pytest
+.pytest_cache
+__pycache__
+
+# ignore image generator output
+images/
+bounding_boxes.npy
+image_locations.txt
