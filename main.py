@@ -1,7 +1,8 @@
-from random import randrange, choice
 import os
+from random import randrange, choice, seed
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
+import click
 
 
 def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
@@ -91,15 +92,27 @@ def save_image_dataset(images):
 
     for i in range(0, len(images)):
         images[i].save(image_paths[i])
+        
+
+@click.command()
+@click.option("--width", "-w", default=256, help="Width of generated output images.")
+@click.option("--height", "-h", default=256, help="Height of generated output images.")
+@click.option("--count", "-c", default=10, help="Number of images to be generated.")
+@click.option("--wordsfile", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
+@click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
+def main(width, height, count, wordsfile, userseed):
+    """Image generator for text localization. Generates images with words and their corresponding AABB's."""
+    if userseed is not None:
+        seed(userseed)
+
+    words = np.loadtxt(wordsfile, dtype=np.dtype(str), delimiter="\n")
+    
+    images, bounding_boxes = create_images_with_text_and_bounding_box(count, words, width, height)
+
+    save_image_dataset(images)
+    np.save("bounding_boxes.npy", bounding_boxes)
 
 
-image_width = 256
-image_height = 256
-image_count = 10
-words = np.loadtxt('words.txt', dtype=np.dtype(str), delimiter="\n")
-
-images, bounding_boxes = create_images_with_text_and_bounding_box(image_count, words, image_width, image_height)
-
-
-save_image_dataset(images)
-np.save("bounding_boxes.npy", bounding_boxes)
+if __name__ == '__main__':
+    # pylint: disable=no-value-for-parameter
+    main()
