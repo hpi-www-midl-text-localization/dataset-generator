@@ -7,7 +7,7 @@ def test_testenv():
 
 @pytest.fixture(scope="session")
 def font():
-    return ImageFont.truetype("../fonts/open-sans/OpenSans-Regular.ttf", 12)
+    return ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", 12)
 
 def test_calculate_word_aabb(font):
     image = Image.new("RGB", (100, 100))
