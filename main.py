@@ -1,4 +1,8 @@
-from random import choice, randrange, seed
+import os
+from random import randrange, choice, seed
+import numpy as np
+from PIL import Image, ImageFont, ImageDraw
+
 import click
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -9,6 +13,7 @@ def calculate_word_aabb(word, top_left, font, image):
     width, height = font.getsize(word)
     bottom_right = (min(top_left[0] + width, image.width), min(top_left[1] + height, image.height))
     return (top_left[0], top_left[1], bottom_right[0], bottom_right[1]), width
+
 
 
 def render_line_and_return_aabb(image, xy, words_in_line, font=None, color=(255, 255, 255)):
@@ -66,28 +71,57 @@ def render_random_words_at_random_position_and_return_aabb(image,
 
     return render_line_and_return_aabb(image, (x, y), text, font=font, color=text_color)
 
+
+def create_images_with_text_and_bounding_box(n, word_list, width, height):
+    """Creates n images with text on them. The images will have the
+    dimensions width x height. Returns generated images and the
+    bounding boxes of the text on them.
+    """
+    images = []
+    bounding_boxes = []
+
+    for _ in range(0, n):
+        image = Image.new("RGB", (width, height))
+
+        rand_color = (randrange(255), randrange(255), randrange(255))
+        bounding_boxes.append(render_random_words_at_random_position_and_return_aabb(image, word_list, text_color=rand_color))
+        images.append(image)
+
+    return images, bounding_boxes
+
+
+def save_image_dataset(images):
+    """Saves the images and creates a text file that stores their
+    locations. This allows the images to be loaded as a Chainer ImageDataset.
+    """
+    if not os.path.exists("./images"):
+        os.makedirs("./images")
+
+    image_paths = [f"./images/image_{i}.png" for i in range(0, len(images))]
+    np.savetxt("image_locations.txt", image_paths, fmt="%s")
+
+    for i in range(0, len(images)):
+        images[i].save(image_paths[i])
+        
+
 @click.command()
 @click.option("--width", "-w", default=256, help="Width of generated output images.")
 @click.option("--height", "-h", default=256, help="Height of generated output images.")
-@click.option("--wordsfile", "--words", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
+@click.option("--count", "-c", default=10, help="Number of images to be generated.")
+@click.option("--wordsfile", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
 @click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
-def main(width, height, words, userseed):
-    """Image generator for textlocalization. Generates images with words and their corresponding AABB's."""
-    if(userseed != None):
+def main(width, height, count, wordsfile, userseed):
+    """Image generator for text localization. Generates images with words and their corresponding AABB's."""
+    if userseed is not None:
         seed(userseed)
 
-    image = Image.new("RGB", (width, height))
+    words = np.loadtxt(wordsfile, dtype=np.dtype(str), delimiter="\n")
+    
+    images, bounding_boxes = create_images_with_text_and_bounding_box(count, words, width, height)
 
-    words = np.loadtxt(words, dtype=np.dtype(str), delimiter="\n")
+    save_image_dataset(images)
+    np.save("bounding_boxes.npy", bounding_boxes)
 
-    rand_color = (randrange(255), randrange(255), randrange(255))
-
-    bboxes = render_random_words_at_random_position_and_return_aabb(image, words, text_color=rand_color)
-
-    for bbox in bboxes:
-        print(bbox)
-
-    image.show()
 
 if __name__ == '__main__':
     # pylint: disable=no-value-for-parameter
