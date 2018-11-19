@@ -2,10 +2,7 @@ import os
 from random import randrange, choice, seed
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
-
 import click
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 
 
 def calculate_word_aabb(word, top_left, font, image):
