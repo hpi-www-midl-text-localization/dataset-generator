@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 from word import Word
 from random import randint, randrange
 from PIL import ImageFont
+from aabb import AABB
 from itertools import chain
 
 
@@ -34,8 +35,31 @@ class Text:
                 word_line.append(word)
             self.lines.append(word_line)
             pos_y += max_height + 1
+        self.calculate_aabb()
+
+    def calculate_aabb(self):
+        top_left = None
+        bottom_right = None
+        for word in self:
+            if(top_left is None):
+                top_left = word.aabb.top_left
+            else:
+                top_left = (min(top_left[0], word.aabb.top_left[0]), min(top_left[1], word.aabb.top_left[1]))
+            if(bottom_right is None):
+                bottom_right = word.aabb.bottom_right
+            else:
+                bottom_right = (max(bottom_right[0], word.aabb.bottom_right[0]), max(bottom_right[1], word.aabb.bottom_right[1]))
+        width = bottom_right[0]-top_left[0]
+        height = bottom_right[1]-top_left[1]
+        self.aabb = AABB((top_left[0]+(width/2), top_left[1]+(height/2)), width, height)
 
     def draw(self, position, image_draw, debug=False):
+        if(debug):
+            top_left = self.aabb.top_left
+            top_left = (top_left[0]+position[0], top_left[1]+position[1])
+            bottom_right = self.aabb.bottom_right
+            bottom_right = (position[0]+bottom_right[0], position[1]+bottom_right[1])
+            image_draw.rectangle([bottom_right, top_left], outline=(0, 0, 255))
         for word in self:
             word.draw(position, image_draw, debug)
 
