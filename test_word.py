@@ -14,5 +14,7 @@ def test_overlaps(font):
     assert(word1.overlaps(word2))
     word2 = Word("test", font, (255, 255, 255), (0, 2 * word1.height))
     assert(not word1.overlaps(word2))
-    with pytest.raises(ValueError):
-        word1.overlaps("Not a word")
+
+
+if __name__ == "__main__":
+    test_overlaps(ImageFont.truetype("fonts/open-sans/OpenSans-Regular.ttf", 12))
