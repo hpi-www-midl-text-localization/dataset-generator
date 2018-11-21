@@ -9,10 +9,10 @@ def font():
 
 
 def test_overlaps(font):
-    word1 = Word("test", font, (0, 0))
-    word2 = Word("test", font, (0, 0))
+    word1 = Word("test", font, (255, 255, 255), (0, 0))
+    word2 = Word("test", font, (255, 255, 255), (0, 0))
     assert(word1.overlaps(word2))
-    word2 = Word("test", font, (0, 2 * word1.height))
+    word2 = Word("test", font, (255, 255, 255), (0, 2 * word1.height))
     assert(not word1.overlaps(word2))
     with pytest.raises(ValueError):
         word1.overlaps("Not a word")

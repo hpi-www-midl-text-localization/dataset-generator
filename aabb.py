@@ -2,25 +2,27 @@ import numpy as np
 
 
 class AABB:
-    @classmethod
-    def fromPositionAndSize(cls, position, width, height):
-        aabb = AABB()
-        aabb.position = position
-        aabb.width = width
-        aabb.height = height
-        return aabb
+
+    def __init__(self, position=(0, 0), width=0, height=0):
+        self.position = position
+        self.width = width
+        self.height = height
 
     def intersects(self, aabb):
         if(not isinstance(aabb, AABB)):
             raise ValueError("Argument must be a of type AABB")
-        selfHalfWidth = self.width / 2
-        selfHalfHeight = self.height / 2
-        aabbHalfWidth = aabb.width / 2
-        aabbHalfHeight = aabb.height / 2
-        return not (self.position[0] - selfHalfWidth > aabb.position[0] + aabbHalfWidth or
-                    self.position[0] + selfHalfWidth < aabb.position[0] - aabbHalfWidth or
-                    self.position[1] - selfHalfHeight > aabb.position[1] + aabbHalfHeight or
-                    self.position[1] + selfHalfHeight < aabb.position[1] - aabbHalfHeight)
+        self_half_width = self.width / 2
+        self_half_height = self.height / 2
+        aabb_half_width = aabb.width / 2
+        aabb_half_height = aabb.height / 2
+        return not (self.position[0] - self_half_width > aabb.position[0] + aabb_half_width or
+                    self.position[0] + self_half_width < aabb.position[0] - aabb_half_width or
+                    self.position[1] - self_half_height > aabb.position[1] + aabb_half_height or
+                    self.position[1] + self_half_height < aabb.position[1] - aabb_half_height)
 
     def scale(self, ratio=0.4):
-        return self.fromPositionAndSize(self.position, self.width * ratio, self.height * ratio)
+        return AABB(self.position, self.width * ratio, self.height * ratio)
+
+    @property
+    def top_left(self):
+        return (self.position[0] - (self.width/2), self.position[1] + (self.height/2))
