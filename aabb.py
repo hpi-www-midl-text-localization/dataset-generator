@@ -25,4 +25,8 @@ class AABB:
 
     @property
     def top_left(self):
-        return (self.position[0] - (self.width/2), self.position[1] + (self.height/2))
+        return (self.position[0] - (self.width/2.0), self.position[1] - (self.height/2.0))
+
+    @property
+    def bottom_right(self):
+        return (self.position[0] + (self.width/2.0), self.position[1] + (self.height/2.0))

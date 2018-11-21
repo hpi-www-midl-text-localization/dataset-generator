@@ -28,7 +28,7 @@ class Word:
 
     @property
     def font(self):
-        self._font
+        return self._font
 
     @font.setter
     def font(self, font):
@@ -43,6 +43,11 @@ class Word:
     def get_scaled_aabb(self, scale=0.4):
         return self.aabb.scale(scale)
 
-    def draw(self, position, image_draw):
+    def draw(self, position, image_draw, debug=False):
         top_left = self.aabb.top_left
-        image_draw.text((top_left[0]+position[0], top_left[1]+position[1]), self.content, self.color, self.font)
+        top_left = (top_left[0]+position[0], top_left[1]+position[1])
+        if(debug):
+            bottom_right = self.aabb.bottom_right
+            bottom_right = (position[0]+bottom_right[0], position[1]+bottom_right[1])
+            image_draw.rectangle([bottom_right, top_left], outline=(128, 128, 128))
+        image_draw.text(top_left, self.content, self.color, font=self.font)

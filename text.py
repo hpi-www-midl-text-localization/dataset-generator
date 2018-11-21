@@ -2,11 +2,17 @@ from PIL import Image, ImageDraw
 from word import Word
 from random import randint, randrange
 from PIL import ImageFont
+from itertools import chain
 
 
 class Text:
     def __init__(self):
         self.lines = []
+
+    def __iter__(self):
+        for line in self.lines:
+            for word in line:
+                yield word
 
     def generate_words(self, words, font, font_size, color, line_max_count=3):
         line_count = randint(1, line_max_count)
@@ -27,18 +33,17 @@ class Text:
                 max_height = max(max_height, word.height)
                 word_line.append(word)
             self.lines.append(word_line)
-            pos_y += max_height
+            pos_y += max_height + 1
 
-    def draw(self, position, image_draw):
-        for line in self.lines:
-            for word in line:
-                word.draw(position, image_draw)
+    def draw(self, position, image_draw, debug=False):
+        for word in self:
+            word.draw(position, image_draw, debug)
 
 
 if __name__ == "__main__":
     text = Text()
-    text.generate_words(["test", "Hello", "World", "This", "nice"], "fonts/open-sans/OpenSans-Regular.ttf", 10, (255, 0, 0))
+    text.generate_words(["test", "Hello", "World", "This", "nice"], "fonts/Roboto/Roboto-Regular.ttf", 20, (255, 0, 0))
     image = Image.new("RGB", (400, 400))
     draw = ImageDraw.Draw(image)
-    text.draw((100, 100), draw)
+    text.draw((100, 100), draw, True)
     image.save("test.png")
