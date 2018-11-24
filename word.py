@@ -1,9 +1,12 @@
 from aabb import AABB
 import numpy as np
-
+from PIL import ImageFont, ImageDraw2
 
 class Word:
     def __init__(self, content, font, color, top_left):
+        if not isinstance(font, ImageFont.FreeTypeFont):
+            raise TypeError('"font" argument has to be of type PIL.ImageFont.FreeTypeFont')
+
         self.content = content
         self.aabb = AABB(top_left, top_left)
         self.font = font
@@ -31,15 +34,23 @@ class Word:
 
     @font.setter
     def font(self, font):
+        if not isinstance(font, ImageFont.FreeTypeFont):
+            raise TypeError('"font" argument has to be of type PIL.ImageFont.FreeTypeFont')
+
         self._font = font
         width, height = font.getsize(self.content)
         self.aabb.bottom_right = (self.aabb.top_left[0] + width, self.aabb.top_left[1] + height)
 
     def overlaps(self, value):
-        if(isinstance(value, AABB)):
-            return self.aabb.intersects(value)
-        else:
-            return self.aabb.intersects(value.aabb)
+        try:
+            if(isinstance(value, AABB)):
+                return self.aabb.intersects(value)
+            elif isinstance(getattr(value, 'aabb'), AABB):
+                return self.aabb.intersects(value.aabb)
+            else:
+                raise TypeError('"value" argument has to be of type AABB or contain an "aabb" property of type AABB')
+        except AttributeError:
+            raise TypeError('"value" argument has to be of type AABB or contain an "aabb" property of type AABB')
 
     def get_scaled_aabb(self, scale=0.4):
         return self.aabb.scale(scale)

@@ -59,10 +59,15 @@ class Text:
         return [(word.aabb.top_left, word.aabb.bottom_right) for word in self]
 
     def overlaps(self, value):
-        if(isinstance(value, AABB)):
-            return self.aabb.intersects(value)
-        else:
-            return self.aabb.intersects(value.aabb)
+        try:
+            if(isinstance(value, AABB)):
+                return self.aabb.intersects(value)
+            elif isinstance(getattr(value, 'aabb'), AABB):
+                return self.aabb.intersects(value.aabb)
+            else:
+                raise TypeError('"value" argument has to be of type AABB or contain an "aabb" property of type AABB')
+        except AttributeError:
+            raise TypeError('"value" argument has to be of type AABB or contain an "aabb" property of type AABB')
 
 
 if __name__ == "__main__":
