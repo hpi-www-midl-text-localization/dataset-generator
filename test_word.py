@@ -24,7 +24,7 @@ def test_constructor(font):
     word = Word("test", font, 'red', (0, 0))
     word = Word("test", font, '#ff0000', (0, 0))
 
-    # Words without an appropriate co-ordinate tupel for top_left are not allowed
+    # Words without an appropriate co-ordinate tuple for top_left are not allowed
     with pytest.raises(TypeError):
         word = word = Word("test", font, (255, 255, 255), (0, '0'))
     with pytest.raises(TypeError):
