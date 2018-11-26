@@ -17,6 +17,10 @@ class Text:
                 yield word
 
     def generate_words(self, words, font, font_size, color, line_max_count=3):
+        """
+            Generates words from the given string list words. Words are placed in order.
+            Randomly decides how many lines the text contains and how many words a line should contain.
+        """
         self.lines = []
         line_count = randint(1, line_max_count)
         lines = [[] for _ in range(line_count)]
@@ -51,7 +55,7 @@ class Text:
     def draw(self, image_draw, debug=False):
         if(debug):
             bottom_right = self.aabb.bottom_right
-            image_draw.rectangle([bottom_right, self.top_left], outline=(0, 0, 255))
+            image_draw.rectangle([self.top_left, bottom_right], outline=(0, 0, 255))
         for word in self:
             word.draw(image_draw, debug=debug)
 

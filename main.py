@@ -15,11 +15,8 @@ def generate_text(
         min_font_size=8,
         max_font_size=24,
         text_color=(255, 255, 255)):
-    """Renders a random single-line text at a random position and
-    allows to set minima and maxima for the text length and for the
-    font size. Returns the AABB of the resulting text.
-
-    For the AABB specifics, see render_text_and_return_aabb().
+    """ Generate Text at the given top_left position and some random words from word_list.
+        Chooses parameters randomly between min and max arguments.
     """
     word_count = randrange(min_word_count, max_word_count + 1)
     words = [choice(word_list) for _ in range(word_count)]
@@ -31,7 +28,7 @@ def generate_text(
     return text
 
 
-def is_text_overlapping(text, texts, image_aabb):
+def is_text_overlapping_with_text_or_image_boundaries(text, texts, image_aabb):
     if(not text.aabb.scale(0.6).inside(image_aabb)):
         return True
     for other_text in texts:
@@ -56,13 +53,17 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
         for i in range(text_count):
             rand_color = (randrange(255), randrange(255), randrange(255))
             text = None
+            tries = 0
             while True:
+                tries += 1
                 x = randrange(width + 1)
                 y = randrange(height + 1)
                 text = generate_text(
                     word_list, (x, y), text_color=rand_color)
-                if(not is_text_overlapping(text, texts, image_aabb)):
+                if(not is_text_overlapping_with_text_or_image_boundaries(text, texts, image_aabb)):
                     break
+                if(tries > 100):
+                    raise Exception("Too many tries of placing a text with given parameters. Please try other parameters or a different seeding.")
             texts.append(text)
         for text in texts:
             bounding_boxes.extend(text.get_word_aabbs())
@@ -92,7 +93,7 @@ def save_image_dataset(images):
 @click.option("--count", "-c", default=10, help="Number of images to be generated.")
 @click.option("--wordsfile", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
 @click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
-@click.option("--debug", "-d", "debug", is_flag=True, help="Generates debugging AABB's.")
+@click.option("--debug", "-d", "debug", is_flag=True, help="Generates debugging AABBs.")
 def main(width, height, count, wordsfile, userseed, debug):
     """Image generator for text localization. Generates images with words and their corresponding AABB's."""
     if userseed is not None:

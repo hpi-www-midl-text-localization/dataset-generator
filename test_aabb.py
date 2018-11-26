@@ -86,7 +86,8 @@ def test_scale():
     with pytest.raises(TypeError):
         AABB((0, 0), (10, 10)).scale('up')
 
-def test_widht_height():
+
+def test_width_height():
     aabb = AABB((0, 0), (50, 30))
     assert(aabb.width == 50)
     assert(aabb.height == 30)

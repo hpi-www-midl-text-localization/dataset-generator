@@ -2,6 +2,7 @@ from aabb import AABB
 import numpy as np
 from PIL import ImageFont, ImageDraw2
 
+
 class Word:
     def __init__(self, content, font, color, top_left):
         if not isinstance(font, ImageFont.FreeTypeFont):
@@ -15,10 +16,6 @@ class Word:
     @property
     def position(self):
         return self.aabb.position
-
-    @position.setter
-    def position(self, position):
-        self.aabb.position = position
 
     @property
     def width(self):
@@ -52,12 +49,12 @@ class Word:
         except AttributeError:
             raise TypeError('"value" argument has to be of type AABB or contain an "aabb" property of type AABB')
 
-    def get_scaled_aabb(self, scale=0.4):
+    def get_scaled_aabb(self, scale):
         return self.aabb.scale(scale)
 
     def draw(self, image_draw, debug=False):
         top_left = self.aabb.top_left
         if(debug):
             bottom_right = self.aabb.bottom_right
-            image_draw.rectangle([bottom_right, top_left], outline=(128, 128, 128))
+            image_draw.rectangle([top_left, bottom_right], outline=(128, 128, 128))
         image_draw.text(top_left, self.content, self.color, font=self.font)

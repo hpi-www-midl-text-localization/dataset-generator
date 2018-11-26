@@ -34,7 +34,7 @@ class AABB:
         return (self.top_left[0] >= aabb.top_left[0] and self.top_left[1] >= aabb.top_left[1] and
                 self.bottom_right[0] <= aabb.bottom_right[0] and self.bottom_right[1] <= aabb.bottom_right[1])
 
-    def scale(self, ratio=0.4):
+    def scale(self, ratio):
         diagonal = ((self.bottom_right[0]-self.top_left[0])/2.0, (self.bottom_right[1]-self.top_left[1])/2.0)
         position = (self.top_left[0] + diagonal[0], self.top_left[1] + diagonal[1])
         new_diagonal = (diagonal[0]*ratio, diagonal[1] * ratio)
@@ -49,3 +49,8 @@ class AABB:
     @property
     def width(self):
         return self.bottom_right[0] - self.top_left[0]
+
+    @property
+    def position(self):
+        diagonal = ((self.bottom_right[0]-self.top_left[0])/2.0, (self.bottom_right[1]-self.top_left[1])/2.0)
+        return (self.top_left[0] + diagonal[0], self.top_left[1] + diagonal[1])
