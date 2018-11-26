@@ -4,12 +4,23 @@ import numpy as np
 class AABB:
 
     def __init__(self, top_left, bottom_right):
+        if not isinstance(top_left[0], (int, float)):
+            raise TypeError("top_left's x co-ordinate has to be an integer or float")
+        if not isinstance(top_left[1], (int, float)):
+            raise TypeError("top_left's y co-ordinate has to be an integer or float")
+        if not isinstance(bottom_right[0], (int, float)):
+            raise TypeError("bottom_right's x co-ordinate has to be an integer or float")
+        if not isinstance(bottom_right[1], (int, float)):
+            raise TypeError("bottom_right's y co-ordinate has to be an integer or float")
+        if bottom_right < top_left:
+            raise ValueError("bottom_right co-ordinate has to be larger than top_left")
+
         self.top_left = top_left
         self.bottom_right = bottom_right
 
     def intersects(self, aabb):
         if(not isinstance(aabb, AABB)):
-            raise ValueError("Argument must be a of type AABB")
+            raise TypeError("Argument must be of type AABB")
         x1 = min(self.bottom_right[0], aabb.bottom_right[0])
         y1 = min(self.bottom_right[1], aabb.bottom_right[1])
 
@@ -19,7 +30,7 @@ class AABB:
 
     def inside(self, aabb):
         if(not isinstance(aabb, AABB)):
-            raise ValueError("Argument must be a of type AABB")
+            raise TypeError("Argument must be of type AABB")
         return (self.top_left[0] >= aabb.top_left[0] and self.top_left[1] >= aabb.top_left[1] and
                 self.bottom_right[0] <= aabb.bottom_right[0] and self.bottom_right[1] <= aabb.bottom_right[1])
 
