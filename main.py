@@ -46,12 +46,15 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
     bounding_boxes = []
 
     for _ in range(0, n):
-        image = Image.new("RGB", (width, height))
+        image_color = (randrange(255), randrange(255), randrange(255))
+        image = Image.new("RGB", (width, height), color=image_color)
         image_aabb = AABB((0, 0), (width, height))
         text_count = randrange(min_text_count, max_text_count)
         texts = []
         for i in range(text_count):
             rand_color = (randrange(255), randrange(255), randrange(255))
+            while np.linalg.norm(np.array(image_color) - np.array(rand_color)) <= 150:
+                rand_color = (randrange(255), randrange(255), randrange(255))
             text = None
             tries = 0
             while True:
