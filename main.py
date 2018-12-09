@@ -50,6 +50,7 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
         image_aabb = AABB((0, 0), (width, height))
         text_count = randrange(min_text_count, max_text_count)
         texts = []
+        current_boxes = []
         for i in range(text_count):
             rand_color = (randrange(255), randrange(255), randrange(255))
             text = None
@@ -66,9 +67,10 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
                     raise Exception("Too many tries of placing a text with given parameters. Please try other parameters or a different seeding.")
             texts.append(text)
         for text in texts:
-            bounding_boxes.extend(text.get_word_aabbs())
+            current_boxes.extend(text.get_word_aabbs())
             text.draw(ImageDraw.Draw(image), debug=debug)
         images.append(image)
+        bounding_boxes.append(current_boxes)
 
     return images, bounding_boxes
 
