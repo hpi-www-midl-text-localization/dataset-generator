@@ -47,14 +47,19 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
 
     for _ in range(0, n):
         image_color = (randrange(255), randrange(255), randrange(255))
+        rl_image_color = relative_luminance(image_color)
         image = Image.new("RGB", (width, height), color=image_color)
         image_aabb = AABB((0, 0), (width, height))
         text_count = randrange(min_text_count, max_text_count)
         texts = []
         for i in range(text_count):
             rand_color = (randrange(255), randrange(255), randrange(255))
-            while np.linalg.norm(np.array(image_color) - np.array(rand_color)) <= 150:
+            rl_text_color = relative_luminance(rand_color)
+            contrast_ratio = (max(rl_text_color, rl_image_color) + 0.05) / (min(rl_text_color, rl_image_color) + 0.05)
+            while contrast_ratio <= 4.5:
                 rand_color = (randrange(255), randrange(255), randrange(255))
+                rl_text_color = relative_luminance(rand_color)
+                contrast_ratio = (max(rl_text_color, rl_image_color) + 0.05) / (min(rl_text_color, rl_image_color) + 0.05)
             text = None
             tries = 0
             while True:
@@ -88,6 +93,20 @@ def save_image_dataset(images):
 
     for i in range(0, len(images)):
         images[i].save(image_paths[i])
+
+
+def relative_luminance(color):
+    R = color[0]/255
+    G = color[1]/255
+    B = color[2]/255
+
+    for element in [R, G, B]:
+        if element <= 0.03928:
+            element /= 12.92
+        else:
+            element = ((element + 0.055) / 1.055)**2.4
+
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B
 
 
 @click.command()
