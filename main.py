@@ -5,6 +5,12 @@ from PIL import Image, ImageFont, ImageDraw
 import click
 from aabb import AABB
 from text import Text
+from pathlib import Path
+
+
+def grab_random_font():
+    ff = [font.as_posix() for font in Path('fonts').glob('**/*.ttf')]
+    return choice(ff)
 
 
 def generate_text(
@@ -24,7 +30,7 @@ def generate_text(
     font_size = randrange(min_font_size, max_font_size +
                           1, 2)  # use only even font sizes
     text = Text(top_left)
-    text.generate_words(words, "fonts/open-sans/OpenSans-Regular.ttf", font_size, text_color)
+    text.generate_words(words, grab_random_font(), font_size, text_color)
     return text
 
 
