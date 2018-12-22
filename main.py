@@ -101,14 +101,15 @@ def relative_luminance(color):
     R = color[0]/255
     G = color[1]/255
     B = color[2]/255
+    k = []
 
     for element in [R, G, B]:
         if element <= 0.03928:
-            element /= 12.92
+            k.append(element / 12.92)
         else:
-            element = ((element + 0.055) / 1.055)**2.4
+            k.append(((element + 0.055) / 1.055)**2.4)
 
-    return 0.2126 * R + 0.7152 * G + 0.0722 * B
+    return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2]
 
 
 @click.command()
