@@ -74,7 +74,7 @@ def create_images_with_text_and_bounding_box(n, word_list, width, height, min_te
                 x = randrange(width + 1)
                 y = randrange(height + 1)
                 text = generate_text(
-                    word_list, (x, y), text_color=rand_color)
+                    word_list, (x, y), min_word_count=1, max_word_count=1, text_color=rand_color)
                 if(not is_text_overlapping_with_text_or_image_boundaries(text, texts, image_aabb)):
                     break
                 if(tries > 100):
@@ -123,16 +123,19 @@ def relative_luminance(color):
 @click.option("--height", "-h", default=256, help="Height of generated output images.")
 @click.option("--count", "-c", default=10, help="Number of images to be generated.")
 @click.option("--wordsfile", default='words.txt', help="Path to list of words to be used for generation.", type=click.Path(exists=True))
+@click.option("--wordlength", "-wl", default=7, help="Length of the words.")
 @click.option("--seed", "-s", "userseed", type=click.INT, help="Seed for generating random numbers.")
 @click.option("--debug", "-d", "debug", is_flag=True, help="Generates debugging AABBs.")
-def main(width, height, count, wordsfile, userseed, debug):
+def main(width, height, count, wordsfile, wordlength, userseed, debug):
     """Image generator for text localization. Generates images with words and their corresponding AABB's."""
     if userseed is not None:
         seed(userseed)
     words = np.loadtxt(wordsfile, dtype=np.dtype(str), delimiter="\n")
+    fixed_length_words = list(filter(lambda x: len(x) == wordlength, words))
+
 
     images, bounding_boxes = create_images_with_text_and_bounding_box(
-        count, words, width, height, debug=debug)
+        count, fixed_length_words, width, height, min_text_count=1, max_text_count=2, debug=debug)
 
     save_image_dataset(images)
     np.save("bounding_boxes.npy", bounding_boxes)
