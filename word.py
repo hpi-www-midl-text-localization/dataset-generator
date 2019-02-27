@@ -1,6 +1,5 @@
 from aabb import AABB
-import numpy as np
-from PIL import ImageFont, ImageDraw2
+from PIL import ImageFont
 
 
 class Word:

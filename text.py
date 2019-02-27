@@ -3,7 +3,6 @@ from word import Word
 from random import randint, randrange
 from PIL import ImageFont
 from aabb import AABB
-from itertools import chain
 
 
 class Text:
